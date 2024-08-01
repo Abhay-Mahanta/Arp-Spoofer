@@ -21,7 +21,7 @@ This Python script performs ARP spoofing (also known as ARP poisoning) to interc
 
 2. **Run the Script**:
    ```bash
-   python your_script.py --target 192.168.92.134 --gateway 192.168.92.2
+   python3 arp_spoof.py --target 192.168.92.134 --gateway 192.168.92.2
 
 ## Notes
 - Legal Disclaimer: This tool should only be used for educational purposes and in environments where you have permission to perform network tests. Unauthorized use of this tool is illegal and unethical.
