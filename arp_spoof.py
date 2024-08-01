@@ -37,12 +37,12 @@ def run(target, gateway):
         while True:
             arpspoof(target, gateway)
             arpspoof(gateway, target)
-            print("\r[+] packets sent = " + str(count), end = "")
+            print("\r\033[1;35m[+] packets sent = \033[0m" + str(count), end = "")
             count += 2
             time.sleep(2)
     except:
         KeyboardInterrupt
-        print("\nExiting..")
+        print("\n\033[1;32mExiting...\033[0m")
         restore(target, gateway)
 
 options = get_arguements()
