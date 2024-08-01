@@ -23,6 +23,10 @@ This Python script performs ARP spoofing (also known as ARP poisoning) to interc
    ```bash
    python3 arp_spoof.py --target [TARGET-IP] --gateway [GATEWAY-IP]
 
+## Example
+![image](https://github.com/user-attachments/assets/f9e9b82d-160f-4e93-b4f4-7ae28f1eaf98)
+
+
 ## Notes
 - Legal Disclaimer: This tool should only be used for educational purposes and in environments where you have permission to perform network tests. Unauthorized use of this tool is illegal and unethical.
 - Dependencies: Ensure that Scapy is properly installed and that you have the necessary permissions to send ARP packets on your network.
